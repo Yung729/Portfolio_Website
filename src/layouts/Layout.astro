@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Analytics from '@vercel/analytics/astro';
 
 interface Props {
   title: string;
@@ -61,6 +62,9 @@ const {
       
       window.localStorage.setItem('theme', theme);
     </script>
+
+    <!-- Vercel Web Analytics -->
+    <Analytics />
   </head>
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-300 antialiased selection:bg-teal-500/20 selection:text-teal-900 dark:selection:bg-teal-400/30 dark:selection:text-teal-200">
     <slot />
