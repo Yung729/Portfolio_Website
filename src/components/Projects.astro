@@ -1,12 +1,14 @@
 ---
 const projects = [
   {
+    id: "smart-billing",
     title: "Vision-Based Smart Retail Billing System",
     description: "An automated retail checkout system utilizing object detection to recognize grocery items instantly. Developed custom object detection models and integrated them with cloud storage and serverless processing pipeline.",
     tech: ["YOLOv8", "Flask", "AWS S3", "DynamoDB", "SageMaker"],
     github: "https://github.com/Yung729/Vision-Based-Smart-Retail-Billing-System",
   },
   {
+    id: "blindmate",
     title: "Blindmate",
     description: "A mobile application designed to assist visually impaired individuals. Incorporates audio-centric navigation, object and text identification, and voice-assisted query interactions using generative AI.",
     tech: ["Kotlin", "Firebase", "Gemini API", "Android SDK"],
@@ -28,8 +30,10 @@ const projects = [
     <!-- Cards Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
       {projects.map((project) => (
-        <div class="group relative rounded-2xl border border-slate-200 dark:border-slate-800/80 glass-card p-6 sm:p-8 flex flex-col justify-between shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-          
+        <div 
+          data-project-id={project.id}
+          class="project-card group relative rounded-2xl border border-slate-200 dark:border-slate-800/80 glass-card p-6 sm:p-8 flex flex-col justify-between shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+        >
           <div>
             <!-- Folder Icon & GitHub Icon -->
             <div class="flex justify-between items-center mb-6">
@@ -43,7 +47,7 @@ const projects = [
                 href={project.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-200"
+                class="github-link text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-200 relative z-10 p-1"
                 aria-label={`GitHub Repository for ${project.title}`}
               >
                 <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
@@ -57,7 +61,7 @@ const projects = [
               {project.title}
             </h3>
             
-            <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+            <p class="text-sm sm:text-base text-slate-650 dark:text-slate-400 leading-relaxed mb-6">
               {project.description}
             </p>
           </div>
@@ -77,3 +81,193 @@ const projects = [
 
   </div>
 </section>
+
+<!-- Project Detail Modal -->
+<div
+  id="project-modal"
+  class="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-all duration-300"
+  role="dialog"
+  aria-modal="true"
+>
+  <!-- Modal Container -->
+  <div
+    id="project-modal-container"
+    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-2xl w-full max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl p-6 sm:p-8 relative transform scale-95 transition-all duration-300"
+  >
+    <!-- Close Button -->
+    <button
+      id="modal-close-btn"
+      class="absolute top-4 right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-150 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none cursor-pointer"
+      aria-label="Close modal"
+    >
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Modal Content -->
+    <div class="space-y-6">
+      <div>
+        <h3 id="modal-title" class="text-2xl font-bold font-display text-slate-900 dark:text-white pr-8"></h3>
+        <div id="modal-tech" class="flex flex-wrap gap-2 mt-3"></div>
+      </div>
+
+      <div class="h-px bg-slate-150 dark:bg-slate-800"></div>
+
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Overview</h4>
+        <p id="modal-long-description" class="text-sm sm:text-base text-slate-650 dark:text-slate-350 leading-relaxed"></p>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Key Features</h4>
+        <ul id="modal-features" class="list-disc list-inside space-y-1 text-sm text-slate-655 dark:text-slate-355 leading-relaxed"></ul>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Challenges & Solutions</h4>
+        <p id="modal-challenges" class="text-sm sm:text-base text-slate-650 dark:text-slate-350 leading-relaxed"></p>
+      </div>
+
+      <div class="h-px bg-slate-150 dark:bg-slate-800"></div>
+
+      <div class="flex items-center gap-4 pt-2">
+        <a
+          id="modal-github-link"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-500/20 hover:bg-teal-500 hover:shadow-teal-500/30 dark:bg-teal-500 dark:text-slate-950 dark:shadow-none dark:hover:bg-teal-400 focus:outline-none transition-all duration-300"
+        >
+          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+          </svg>
+          View Code
+        </a>
+        <button
+          id="modal-cancel-btn"
+          class="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-200 dark:hover:bg-slate-800/80 focus:outline-none transition-all duration-300 cursor-pointer"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Project data passed from frontmatter to client script
+  const projectsData = [
+    {
+      id: "smart-billing",
+      title: "Vision-Based Smart Retail Billing System",
+      tech: ["YOLOv8", "Flask", "AWS S3", "DynamoDB", "SageMaker"],
+      github: "https://github.com/Yung729/Vision-Based-Smart-Retail-Billing-System",
+      longDescription: "This project solves the bottleneck in traditional retail checkout queues by implementing an automated, camera-based checkout system. When items are placed on the counter, the camera captures an image and passes it to a fine-tuned YOLOv8 object detection model. The model identifies multiple items simultaneously and instantly retrieves pricing details from DynamoDB to construct the bill.",
+      keyFeatures: [
+        "Real-time object detection processing under 150ms per frame.",
+        "AWS SageMaker model training pipeline with custom dataset annotation.",
+        "Flask-based REST APIs serving predictions and billing calculations.",
+        "DynamoDB transactional ledger for pricing metadata storage."
+      ],
+      challenges: "Training the model to handle overlapping items and varying lighting conditions was difficult. Resolved this by building a custom dataset with heavy augmentation (rotation, brightness changes, noise) and deploying a multi-stage post-processing logic to filter redundant bounding boxes."
+    },
+    {
+      id: "blindmate",
+      title: "Blindmate",
+      tech: ["Kotlin", "Firebase", "Gemini API", "Android SDK"],
+      github: "https://github.com/Yung729/Blindmate",
+      longDescription: "Blindmate is a social-impact Android application designed to give visually impaired individuals higher independence. The app utilizes the smartphone camera and audio interface to serve as virtual eyes. By leveraging the Gemini API's multimodal analysis, users can point their camera at anything and ask verbal questions about their surroundings, receiving highly accurate audio feedback.",
+      keyFeatures: [
+        "Audio-first UI designed using accessibility guidelines.",
+        "Integration of Android Text-to-Speech (TTS) and Speech-to-Text (STT).",
+        "Multimodal AI querying powered by Gemini 1.5 Flash to describe complex scenes.",
+        "Firebase authentication and real-time database sync for user configurations."
+      ],
+      challenges: "Ensuring low latency for real-time speech interaction on mobile devices was critical. Optimized this by handling TTS/STT pipelines on separate background threads and utilizing local lightweight preprocessing before sending media packets to Gemini."
+    }
+  ];
+
+  // DOM Elements
+  const modal = document.getElementById('project-modal');
+  const modalContainer = document.getElementById('project-modal-container');
+  const closeBtn = document.getElementById('modal-close-btn');
+  const cancelBtn = document.getElementById('modal-cancel-btn');
+  
+  const mTitle = document.getElementById('modal-title');
+  const mTech = document.getElementById('modal-tech');
+  const mLongDesc = document.getElementById('modal-long-description');
+  const mFeatures = document.getElementById('modal-features');
+  const mChallenges = document.getElementById('modal-challenges');
+  const mGithub = document.getElementById('modal-github-link') as HTMLAnchorElement;
+
+  const openModal = (projectId: string) => {
+    const project = projectsData.find(p => p.id === projectId);
+    if (!project || !modal || !modalContainer) return;
+
+    // Populate data
+    if (mTitle) mTitle.textContent = project.title;
+    if (mLongDesc) mLongDesc.textContent = project.longDescription;
+    if (mChallenges) mChallenges.textContent = project.challenges;
+    if (mGithub) mGithub.href = project.github;
+
+    // Tech stack
+    if (mTech) {
+      mTech.innerHTML = project.tech.map(t => 
+        `<span class="inline-flex items-center rounded bg-slate-200/60 dark:bg-slate-800/80 px-2 py-0.5 text-xs font-semibold text-slate-700 dark:text-slate-305">${t}</span>`
+      ).join('');
+    }
+
+    // Key features
+    if (mFeatures) {
+      mFeatures.innerHTML = project.keyFeatures.map(f => 
+        `<li>${f}</li>`
+      ).join('');
+    }
+
+    // Open animations
+    modal.classList.remove('pointer-events-none', 'opacity-0');
+    modal.classList.add('pointer-events-auto', 'opacity-100');
+    modalContainer.classList.remove('scale-95');
+    modalContainer.classList.add('scale-100');
+
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    if (!modal || !modalContainer) return;
+    
+    modal.classList.add('pointer-events-none', 'opacity-0');
+    modal.classList.remove('pointer-events-auto', 'opacity-100');
+    modalContainer.classList.add('scale-95');
+    modalContainer.classList.remove('scale-100');
+    
+    document.body.style.overflow = '';
+  };
+
+  // Bind click to card elements
+  document.querySelectorAll('.project-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Ignore if clicking the github link itself
+      if ((e.target as HTMLElement).closest('.github-link')) return;
+      
+      const projectId = card.getAttribute('data-project-id');
+      if (projectId) openModal(projectId);
+    });
+  });
+
+  // Bind close events
+  closeBtn?.addEventListener('click', closeModal);
+  cancelBtn?.addEventListener('click', closeModal);
+  
+  // Close on backdrop click
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>

@@ -64,5 +64,34 @@ const {
   </head>
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-300 antialiased selection:bg-teal-500/20 selection:text-teal-900 dark:selection:bg-teal-400/30 dark:selection:text-teal-200">
     <slot />
+
+    <script>
+      // --- Scroll Reveal Animation ---
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target); // Trigger only once
+          }
+        });
+      }, observerOptions);
+
+      const initReveal = () => {
+        const revealElements = document.querySelectorAll('.reveal');
+        revealElements.forEach(el => observer.observe(el));
+      };
+
+      // Run on initial load
+      initReveal();
+
+      // Support page transitions or dynamically rendered content if any
+      document.addEventListener('astro:after-swap', initReveal);
+    </script>
   </body>
 </html>
