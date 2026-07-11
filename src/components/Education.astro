@@ -1,0 +1,75 @@
+---
+const educationData = [
+  {
+    degree: "Bachelor of Computer Science (Honours) in Software Engineering",
+    institution: "Tunku Abdul Rahman University of Management and Technology (TAR UMT)",
+    period: "Jul 2024 – Jul 2026 (Expected)",
+    details: [
+      "Focused on advanced software engineering processes, systems analysis & design, enterprise application development, and cloud computing.",
+      "Engaged in hands-on backend development and database integration projects."
+    ]
+  },
+  {
+    degree: "Diploma in Computer Science",
+    institution: "Tunku Abdul Rahman University of Management and Technology (TAR UMT)",
+    period: "Jun 2022 – Jun 2024",
+    details: [
+      "Built a solid foundation in core computer science concepts, object-oriented programming, data structures, and relational databases.",
+      "Graduated with a practical understanding of web application development."
+    ]
+  }
+];
+---
+
+<section id="education" class="py-20 sm:py-28 relative">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    
+    <!-- Section Header -->
+    <div class="mb-16">
+      <h2 class="text-base font-semibold uppercase tracking-wider text-teal-600 dark:text-teal-400">Education</h2>
+      <p class="mt-2 text-3xl sm:text-4xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white">Academic Qualifications</p>
+      <div class="mt-4 h-1 w-12 rounded bg-teal-500"></div>
+    </div>
+
+    <!-- Cards Layout -->
+    <div class="space-y-8 max-w-4xl mx-auto">
+      {educationData.map((edu) => (
+        <div class="relative rounded-2xl border border-slate-200 dark:border-slate-800/80 glass-card p-6 sm:p-8 flex flex-col md:flex-row md:items-start justify-between gap-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+          
+          <!-- Cap icon / Visual indicator -->
+          <div class="h-12 w-12 rounded-xl bg-teal-500/10 dark:bg-teal-400/15 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
+            <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l4-2.2v3.3l-4 2.2V14z" />
+            </svg>
+          </div>
+
+          <!-- Academic Info -->
+          <div class="flex-grow space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-xl font-bold font-display text-slate-900 dark:text-white leading-tight">
+                {edu.degree}
+              </h3>
+              <span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50 shrink-0">
+                {edu.period}
+              </span>
+            </div>
+            
+            <p class="text-sm font-semibold text-teal-600 dark:text-teal-400">
+              {edu.institution}
+            </p>
+
+            <ul class="space-y-2 text-sm sm:text-base text-slate-600 dark:text-slate-400 list-disc list-outside pl-4 pt-2">
+              {edu.details.map((detail) => (
+                <li class="pl-1 leading-relaxed">{detail}</li>
+              ))}
+            </ul>
+          </div>
+
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>

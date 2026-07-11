@@ -1,0 +1,59 @@
+---
+const skillCategories = [
+  {
+    title: "Languages & Frameworks",
+    icon: `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>`,
+    skills: ["Java", "Spring Boot", "Angular", "HTML / CSS", "JavaScript", "RESTful APIs", "MySQL"]
+  },
+  {
+    title: "Tools & Technologies",
+    icon: `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`,
+    skills: ["Git / GitLab", "Jenkins", "Postman", "WordPress", "Agile Methodologies", "Jira"]
+  },
+  {
+    title: "Spoken Languages",
+    icon: `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 11.37 7.31 16.5 3 19" /></svg>`,
+    skills: ["Mandarin (Native)", "English (Professional)", "Bahasa Melayu (Professional)"]
+  }
+];
+---
+
+<section id="skills" class="py-20 sm:py-28 bg-slate-100/50 dark:bg-slate-900/30">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    
+    <!-- Section Header -->
+    <div class="mb-16">
+      <h2 class="text-base font-semibold uppercase tracking-wider text-teal-600 dark:text-teal-400">Skills</h2>
+      <p class="mt-2 text-3xl sm:text-4xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white">Technical Toolkit</p>
+      <div class="mt-4 h-1 w-12 rounded bg-teal-500"></div>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      {skillCategories.map((category) => (
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800/80 glass-card p-6 sm:p-8 flex flex-col shadow-sm">
+          
+          <!-- Category Header -->
+          <div class="flex items-center gap-3 mb-6">
+            <div class="h-10 w-10 rounded-xl bg-teal-500/10 dark:bg-teal-400/15 flex items-center justify-center text-teal-600 dark:text-teal-400">
+              <Fragment set:html={category.icon} />
+            </div>
+            <h3 class="text-lg font-bold font-display text-slate-900 dark:text-white">{category.title}</h3>
+          </div>
+
+          <!-- Skills list -->
+          <div class="flex flex-wrap gap-2.5 mt-auto">
+            {category.skills.map((skill) => (
+              <span class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white/80 px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm hover:border-teal-500/30 hover:bg-white transition-all duration-200 dark:border-slate-800/60 dark:bg-slate-900/40 dark:text-slate-300 dark:hover:border-teal-400/30 dark:hover:bg-slate-900">
+                <span class="h-1.5 w-1.5 rounded-full bg-teal-500"></span>
+                {skill}
+              </span>
+            ))}
+          </div>
+
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
