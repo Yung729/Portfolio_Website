@@ -16,7 +16,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
       
       <!-- Text Content -->
-      <div class="lg:col-span-8 space-y-6 animate-fade-in-up">
+      <div class="lg:col-span-7 space-y-6 animate-fade-in-up">
         
         <!-- Welcome Badge -->
         <div class="inline-flex items-center gap-2 rounded-full border border-teal-500/20 bg-teal-500/5 px-3 py-1 text-xs sm:text-sm font-medium text-teal-800 dark:text-teal-300">
@@ -34,8 +34,8 @@
           </span>
         </h1>
 
-        <p class="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-slate-200">
-          Software Engineering Student &amp; Developer
+        <p class="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-slate-200 min-h-[40px] flex items-center">
+          <span id="typewriter-text" class="text-teal-600 dark:text-teal-400"></span><span class="animate-pulse text-teal-600 dark:text-teal-400 font-extrabold ml-1">|</span>
         </p>
 
         <p class="max-w-xl text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -103,44 +103,54 @@
 
       </div>
 
-      <!-- Hero Visual Art / Graphic Card (Premium Look) -->
-      <div class="lg:col-span-4 flex justify-center lg:justify-end animate-fade-in animation-delay-200">
-        <div class="relative w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 group">
+      <!-- Hero Terminal Widget (Premium Interactive CLI) -->
+      <div class="lg:col-span-5 w-full flex justify-center lg:justify-end animate-fade-in animation-delay-200">
+        <div class="relative w-full max-w-lg rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-950 text-slate-100 shadow-2xl overflow-hidden flex flex-col font-mono text-xs sm:text-sm h-[380px] group transition-all duration-300 hover:border-teal-500/50">
           
-          <!-- Outer decorative rotating border/glow -->
-          <div class="absolute inset-0 rounded-3xl bg-gradient-to-tr from-teal-500 to-emerald-400 opacity-20 blur-xl group-hover:opacity-35 transition-opacity duration-300"></div>
+          <!-- Outer decorative glow -->
+          <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-teal-500 to-emerald-400 opacity-5 blur-xl group-hover:opacity-10 transition-opacity duration-300 -z-10"></div>
           
-          <!-- Card Base -->
-          <div class="absolute inset-0 rounded-3xl border border-slate-200 dark:border-slate-800 glass-card p-6 flex flex-col justify-between overflow-hidden shadow-2xl transition-all duration-300 group-hover:translate-y-[-4px]">
-            
-            <!-- Graphic Design -->
-            <div class="flex justify-between items-start">
-              <div class="h-10 w-10 rounded-xl bg-teal-500/10 dark:bg-teal-400/15 flex items-center justify-center text-teal-600 dark:text-teal-300">
-                <code class="font-bold text-lg">&lt;/&gt;</code>
-              </div>
-              <span class="text-xs font-mono text-slate-400 dark:text-slate-500">System.out.println("Hello");</span>
-            </div>
-
-            <!-- Conceptual Design Visuals (Code lines visual representation) -->
-            <div class="space-y-4 my-8">
-              <div class="h-2 w-3/4 rounded-full bg-slate-300 dark:bg-slate-700"></div>
-              <div class="h-2 w-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-400"></div>
-              <div class="h-2 w-5/6 rounded-full bg-slate-300 dark:bg-slate-700"></div>
-              <div class="h-2 w-2/3 rounded-full bg-slate-300 dark:bg-slate-700"></div>
-            </div>
-
-            <!-- Stats/Footer of Card -->
-            <div class="flex items-center justify-between border-t border-slate-200/50 dark:border-slate-800/50 pt-4">
-              <div>
-                <p class="text-xs text-slate-400 dark:text-slate-500">Specialization</p>
-                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">Backend &amp; Cloud</p>
-              </div>
-              <div class="text-right">
-                <p class="text-xs text-slate-400 dark:text-slate-500">Experience</p>
-                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">2 Internships</p>
-              </div>
+          <!-- Terminal Header -->
+          <div class="bg-slate-900 px-4 py-3 flex items-center justify-between border-b border-slate-850 select-none shrink-0">
+            <!-- Window dots -->
+            <div class="flex items-center gap-1.5">
+              <span class="h-3 w-3 rounded-full bg-rose-500/80 hover:bg-rose-500 transition-colors cursor-pointer"></span>
+              <span class="h-3 w-3 rounded-full bg-amber-500/80 hover:bg-amber-500 transition-colors cursor-pointer"></span>
+              <span class="h-3 w-3 rounded-full bg-emerald-500/80 hover:bg-emerald-500 transition-colors cursor-pointer"></span>
             </div>
             
+            <!-- Title -->
+            <span class="text-xs text-slate-450 font-sans font-medium">leong@portfolio: ~</span>
+            
+            <!-- Shell Type/Indicator -->
+            <span class="text-xxs px-1.5 py-0.5 rounded bg-slate-850 text-slate-400 font-sans">zsh</span>
+          </div>
+          
+          <!-- Terminal Body -->
+          <div id="terminal-body" class="flex-1 p-4 overflow-y-auto space-y-2 select-text scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent cursor-text">
+            <!-- Static Welcome Output -->
+            <div class="text-slate-400 leading-relaxed text-xs">
+              <p class="text-teal-400 font-semibold mb-1">Kah Yung's Interactive Portfolio CLI (v1.1.0)</p>
+              <p class="text-slate-500">Type <span class="text-emerald-400 font-semibold">help</span> to view all available commands.</p>
+            </div>
+            
+            <!-- Dynamic Command Log -->
+            <div id="terminal-output" class="space-y-2"></div>
+            
+            <!-- User Prompt Line -->
+            <div class="flex items-center gap-1.5 pt-1">
+              <span class="text-teal-400 shrink-0">kahyung@portfolio:~$</span>
+              <input
+                id="terminal-input"
+                type="text"
+                class="bg-transparent border-none outline-none focus:ring-0 p-0 text-slate-100 flex-1 caret-teal-400 focus:outline-none w-full"
+                aria-label="Terminal prompt input"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+              />
+            </div>
           </div>
           
         </div>
@@ -149,3 +159,124 @@
     </div>
   </div>
 </section>
+
+<script>
+  // --- Typewriter Effect ---
+  const words = [
+    "Software Engineering Student",
+    "Backend & API Developer",
+    "Java & Spring Boot Specialist",
+    "Full-Stack Builder"
+  ];
+  
+  let wordIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  const typewriterText = document.getElementById('typewriter-text');
+  
+  const type = () => {
+    const currentWord = words[wordIndex];
+    if (isDeleting) {
+      charIndex--;
+    } else {
+      charIndex++;
+    }
+    
+    if (typewriterText) {
+      typewriterText.textContent = currentWord.substring(0, charIndex);
+    }
+    
+    let typeSpeed = isDeleting ? 40 : 80;
+    
+    if (!isDeleting && charIndex === currentWord.length) {
+      typeSpeed = 2000; // Hold at full word
+      isDeleting = true;
+    } else if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      wordIndex = (wordIndex + 1) % words.length;
+      typeSpeed = 400; // Pause before next word
+    }
+    
+    setTimeout(type, typeSpeed);
+  };
+  
+  // Start typewriter on load
+  if (typewriterText) {
+    setTimeout(type, 1000);
+  }
+
+  // --- Terminal Interactive CLI ---
+  const terminalInput = document.getElementById('terminal-input') as HTMLInputElement;
+  const terminalBody = document.getElementById('terminal-body');
+  const terminalOutput = document.getElementById('terminal-output');
+
+  const commands: Record<string, (args?: string[]) => string> = {
+    help: () => `Available commands:<br>  <span class="text-teal-400">about</span>    - Introduce myself<br>  <span class="text-teal-400">skills</span>   - List my technical stack<br>  <span class="text-teal-400">projects</span> - Highlight recent projects<br>  <span class="text-teal-400">contact</span>  - Get my contact channels<br>  <span class="text-teal-400">clear</span>    - Clear terminal screen<br>  <span class="text-teal-400">sudo</span>     - Run high privilege command`,
+    about: () => `Hi, I'm Leong Kah Yung, a Software Engineering student at APU (Asia Pacific University). I focus on build scalability, robust backend logic with Java & Spring Boot, and modern user interfaces.`,
+    skills: () => `<span class="text-teal-400">[Languages]</span> Java, Kotlin, JS/TS, SQL, HTML/CSS<br><span class="text-teal-400">[Frameworks]</span> Spring Boot, Angular, Flask, Astro, Android SDK<br><span class="text-teal-400">[Tools/Cloud]</span> AWS (S3, DynamoDB, SageMaker), Git, Firebase, REST APIs`,
+    projects: () => `1. <span class="text-emerald-400 font-semibold">Vision-Based Smart Retail Billing System</span> (YOLOv8, Flask, AWS)<br>2. <span class="text-emerald-400 font-semibold">Blindmate Voice-Assistive Android App</span> (Kotlin, Gemini API)<br>Check them out in the Projects section below!`,
+    contact: () => `Email:    <a href="mailto:leongkahyung@gmail.com" class="underline hover:text-teal-400">leongkahyung@gmail.com</a><br>Phone:    +60 11-2459 0628<br>GitHub:   <a href="https://github.com/Yung729" target="_blank" class="underline hover:text-teal-400">github.com/Yung729</a><br>LinkedIn: <a href="https://www.linkedin.com/in/kahyung" target="_blank" class="underline hover:text-teal-400">linkedin.com/in/kahyung</a>`,
+    clear: () => {
+      if (terminalOutput) terminalOutput.innerHTML = '';
+      return '';
+    },
+    sudo: (args) => {
+      if (args && args.join(' ') === 'get-hired') {
+        setTimeout(() => {
+          window.location.href = 'mailto:leongkahyung@gmail.com?subject=Job%20Opportunity%20-%20Hiring%20Offer';
+        }, 2000);
+        return `<span class="text-emerald-400 font-bold">Access Granted! Redirecting to mailto:leongkahyung@gmail.com in 2 seconds... 🚀</span>`;
+      }
+      return `Usage: <span class="text-teal-400">sudo get-hired</span>`;
+    }
+  };
+
+  const handleCommand = (rawInput: string) => {
+    const input = rawInput.trim();
+    if (!input) return;
+
+    const parts = input.split(' ');
+    const cmd = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    // Create command log
+    const cmdLine = document.createElement('div');
+    cmdLine.innerHTML = `<span class="text-teal-400">kahyung@portfolio:~$</span> <span class="text-slate-100">${input}</span>`;
+    terminalOutput?.appendChild(cmdLine);
+
+    // Execute
+    let response = '';
+    if (commands[cmd]) {
+      response = commands[cmd](args);
+    } else {
+      response = `bash: command not found: <span class="text-rose-400">${cmd}</span>. Type <span class="text-teal-400">help</span> for options.`;
+    }
+
+    if (response) {
+      const responseLine = document.createElement('div');
+      responseLine.className = 'text-slate-400 whitespace-pre-wrap leading-relaxed';
+      responseLine.innerHTML = response;
+      terminalOutput?.appendChild(responseLine);
+    }
+
+    // Scroll to bottom
+    setTimeout(() => {
+      if (terminalBody) {
+        terminalBody.scrollTop = terminalBody.scrollHeight;
+      }
+    }, 10);
+  };
+
+  // Event listeners
+  terminalBody?.addEventListener('click', () => {
+    terminalInput?.focus();
+  });
+
+  terminalInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const val = terminalInput.value;
+      handleCommand(val);
+      terminalInput.value = '';
+    }
+  });
+</script>
