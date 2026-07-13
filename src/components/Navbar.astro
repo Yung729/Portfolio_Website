@@ -27,7 +27,8 @@ const navLinks = [
         {navLinks.map((link) => (
           <a
             href={link.href}
-            class="text-sm font-medium text-slate-600 hover:text-teal-600 dark:text-slate-300 dark:hover:text-teal-400 transition-colors duration-200"
+            data-section={link.href.replace('#', '')}
+            class="nav-link text-sm font-medium text-slate-600 hover:text-teal-600 dark:text-slate-300 dark:hover:text-teal-400 transition-colors duration-200"
           >
             {link.name}
           </a>
@@ -113,7 +114,8 @@ const navLinks = [
       {navLinks.map((link) => (
         <a
           href={link.href}
-          class="mobile-nav-link block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-teal-400 transition-colors duration-200"
+          data-section={link.href.replace('#', '')}
+          class="mobile-nav-link nav-link block rounded-lg px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-teal-400 transition-colors duration-200"
         >
           {link.name}
         </a>
@@ -178,4 +180,34 @@ const navLinks = [
       scrollProgress.style.width = scrolled + '%';
     }
   });
+
+  // --- Active Nav Highlight ---
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link[data-section]');
+
+  const setActiveLink = (sectionId: string) => {
+    navLinks.forEach(link => {
+      const isActive = link.getAttribute('data-section') === sectionId;
+      if (isActive) {
+        link.classList.add('text-teal-600', 'dark:text-teal-400', '!text-teal-600');
+        link.classList.remove('text-slate-600', 'dark:text-slate-300', 'text-slate-700', 'dark:text-slate-300');
+      } else {
+        link.classList.remove('text-teal-600', 'dark:text-teal-400', '!text-teal-600');
+        link.classList.add('text-slate-600', 'dark:text-slate-300');
+      }
+    });
+  };
+
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveLink(entry.target.id);
+        }
+      });
+    },
+    { rootMargin: '-40% 0px -50% 0px', threshold: 0 }
+  );
+
+  sections.forEach(section => sectionObserver.observe(section));
 </script>

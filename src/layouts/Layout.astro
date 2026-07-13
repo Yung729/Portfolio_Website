@@ -65,7 +65,54 @@ const {
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-300 antialiased selection:bg-teal-500/20 selection:text-teal-900 dark:selection:bg-teal-400/30 dark:selection:text-teal-200">
     <slot />
 
+    <!-- Global Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none" aria-live="polite"></div>
+
     <script>
+      // --- Global Toast System ---
+      type ToastType = 'success' | 'error' | 'info';
+
+      window.showToast = (message: string, type: ToastType = 'success', duration = 3500) => {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const icons = {
+          success: `<svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`,
+          error:   `<svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>`,
+          info:    `<svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        };
+        const colors = {
+          success: 'bg-emerald-600 text-white shadow-emerald-500/20',
+          error:   'bg-rose-600 text-white shadow-rose-500/20',
+          info:    'bg-teal-600 text-white shadow-teal-500/20',
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `pointer-events-auto flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold shadow-lg ${colors[type]} translate-y-4 opacity-0 transition-all duration-300`;
+        toast.innerHTML = `${icons[type]}<span>${message}</span>`;
+        container.appendChild(toast);
+
+        // Animate in
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            toast.classList.remove('translate-y-4', 'opacity-0');
+          });
+        });
+
+        // Animate out and remove
+        setTimeout(() => {
+          toast.classList.add('translate-y-4', 'opacity-0');
+          toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+        }, duration);
+      };
+
+      // Extend Window type
+      declare global {
+        interface Window {
+          showToast: (message: string, type?: ToastType, duration?: number) => void;
+        }
+      }
+
       // --- Scroll Reveal Animation ---
       const observerOptions = {
         root: null,
@@ -89,8 +136,6 @@ const {
 
       // Run on initial load
       initReveal();
-
-      // Support page transitions or dynamically rendered content if any
       document.addEventListener('astro:after-swap', initReveal);
     </script>
   </body>

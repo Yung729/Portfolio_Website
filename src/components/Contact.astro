@@ -35,9 +35,28 @@
             </div>
             <div>
               <h4 class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Email</h4>
-              <a href="mailto:leongkahyung@gmail.com" class="text-base font-semibold text-slate-800 dark:text-slate-200 hover:text-teal-600 dark:hover:text-teal-400 transition-colors duration-150">
-                leongkahyung@gmail.com
-              </a>
+              <div class="flex items-center gap-2 flex-wrap">
+                <a href="mailto:leongkahyung@gmail.com" class="text-base font-semibold text-slate-800 dark:text-slate-200 hover:text-teal-600 dark:hover:text-teal-400 transition-colors duration-150">
+                  leongkahyung@gmail.com
+                </a>
+                <button
+                  id="copy-email-btn"
+                  type="button"
+                  title="Copy email address"
+                  aria-label="Copy email address to clipboard"
+                  class="inline-flex items-center gap-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-800/60 px-2 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:border-teal-500/50 hover:text-teal-600 dark:hover:text-teal-400 transition-all duration-200"
+                >
+                  <!-- Copy icon -->
+                  <svg id="copy-icon" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <!-- Check icon (hidden) -->
+                  <svg id="check-icon" class="hidden h-3.5 w-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span id="copy-label">Copy</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -80,7 +99,7 @@
       <div class="md:col-span-7">
         <div class="rounded-2xl border border-slate-200 dark:border-slate-800/80 glass-card p-5 sm:p-8 shadow-sm">
           
-          <form action="https://formspree.io/f/placeholder" method="POST" class="space-y-6">
+          <form id="contact-form" action="https://formspree.io/f/placeholder" method="POST" class="space-y-6">
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <!-- Name Input -->
@@ -143,12 +162,19 @@
 
             <!-- Submit Button -->
             <button
+              id="submit-btn"
               type="submit"
-              class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-6 py-4 text-base font-semibold text-white shadow-lg shadow-teal-500/20 hover:bg-teal-500 hover:shadow-teal-500/30 dark:bg-teal-500 dark:text-slate-950 dark:shadow-none dark:hover:bg-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all duration-300 cursor-pointer"
+              class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-6 py-4 text-base font-semibold text-white shadow-lg shadow-teal-500/20 hover:bg-teal-500 hover:shadow-teal-500/30 dark:bg-teal-500 dark:text-slate-950 dark:shadow-none dark:hover:bg-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all duration-300 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Send Message
-              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <span id="submit-label">Send Message</span>
+              <!-- Send icon (default) -->
+              <svg id="submit-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              <!-- Spinner (hidden during loading) -->
+              <svg id="submit-spinner" class="hidden h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
               </svg>
             </button>
 
@@ -160,3 +186,76 @@
     </div>
   </div>
 </section>
+
+<script>
+  // --- Copy Email to Clipboard ---
+  const copyBtn = document.getElementById('copy-email-btn');
+  const copyIcon = document.getElementById('copy-icon');
+  const checkIcon = document.getElementById('check-icon');
+  const copyLabel = document.getElementById('copy-label');
+
+  copyBtn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText('leongkahyung@gmail.com');
+      // Swap icons
+      copyIcon?.classList.add('hidden');
+      checkIcon?.classList.remove('hidden');
+      if (copyLabel) copyLabel.textContent = 'Copied!';
+      // Show toast
+      window.showToast('📋 Email copied to clipboard!', 'success');
+      // Reset after 2s
+      setTimeout(() => {
+        copyIcon?.classList.remove('hidden');
+        checkIcon?.classList.add('hidden');
+        if (copyLabel) copyLabel.textContent = 'Copy';
+      }, 2000);
+    } catch {
+      window.showToast('Failed to copy. Please copy manually.', 'error');
+    }
+  });
+
+  // --- AJAX Contact Form Submission ---
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+  const submitLabel = document.getElementById('submit-label');
+  const submitIcon = document.getElementById('submit-icon');
+  const submitSpinner = document.getElementById('submit-spinner');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!form || !submitBtn) return;
+
+    // Show loading state
+    submitBtn.disabled = true;
+    if (submitLabel) submitLabel.textContent = 'Sending...';
+    submitIcon?.classList.add('hidden');
+    submitSpinner?.classList.remove('hidden');
+
+    try {
+      const data = new FormData(form);
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { Accept: 'application/json' },
+      });
+
+      if (response.ok) {
+        window.showToast('✅ Message sent! I\'ll get back to you soon.', 'success', 4500);
+        form.reset();
+      } else {
+        const json = await response.json().catch(() => ({}));
+        const msg = json?.errors?.map((e: { message: string }) => e.message).join(', ') || 'Something went wrong.';
+        window.showToast(`❌ ${msg}`, 'error', 5000);
+      }
+    } catch {
+      window.showToast('❌ Network error. Please try again.', 'error');
+    } finally {
+      // Restore button
+      submitBtn.disabled = false;
+      if (submitLabel) submitLabel.textContent = 'Send Message';
+      submitIcon?.classList.remove('hidden');
+      submitSpinner?.classList.add('hidden');
+    }
+  });
+</script>
