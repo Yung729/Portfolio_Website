@@ -1,0 +1,703 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+---
+
+<Layout title="Interview Prep | KY Admin" description="Private interview preparation tool">
+  <!-- Auth Gate -->
+  <div id="auth-gate" class="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+    <div class="w-full max-w-sm">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-teal-500/10 border border-teal-500/20 mb-4">
+          <svg class="h-8 w-8 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-white font-display">Admin Access</h1>
+        <p class="text-slate-500 text-sm mt-1">Interview Prep Portal</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div class="space-y-4">
+          <div>
+            <label for="admin-password" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+            <input
+              id="admin-password"
+              type="password"
+              placeholder="Enter password..."
+              autocomplete="current-password"
+              class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200"
+            />
+          </div>
+          <p id="auth-error" class="text-rose-400 text-sm hidden">Incorrect password. Try again.</p>
+          <button
+            id="auth-submit"
+            type="button"
+            class="w-full bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-xl py-3 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+          >
+            Unlock
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App (hidden until auth) -->
+  <div id="main-app" class="hidden min-h-screen bg-slate-950 text-slate-100">
+
+    <!-- Top Bar -->
+    <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="h-8 w-8 rounded-lg bg-teal-500/15 flex items-center justify-center text-teal-400">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <span class="font-bold font-display text-white">Interview Prep</span>
+          <span id="total-badge" class="text-xs bg-teal-500/15 text-teal-400 border border-teal-500/20 rounded-full px-2 py-0.5 font-semibold">0 questions</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Study mode toggle -->
+          <button
+            id="study-mode-btn"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:text-teal-400 hover:border-teal-500/50 text-sm font-medium transition-all duration-200"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span id="study-mode-label">Study Mode</span>
+          </button>
+          <!-- Add question -->
+          <button
+            id="add-btn"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold transition-all duration-200"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Add Question
+          </button>
+          <!-- Logout -->
+          <button id="logout-btn" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200" title="Logout">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <!-- Search + Filters -->
+      <div class="flex flex-col sm:flex-row gap-4 mb-8">
+        <div class="relative flex-1">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Search questions..."
+            class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-slate-200 placeholder:text-slate-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200"
+          />
+        </div>
+        <select
+          id="difficulty-filter"
+          class="bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-300 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200"
+        >
+          <option value="">All Difficulties</option>
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+
+      <!-- Category Pills -->
+      <div class="flex flex-wrap gap-2 mb-8" id="category-pills">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Stats Row -->
+      <div id="stats-row" class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Questions Grid -->
+      <div id="questions-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-24">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-800 mb-4">
+          <svg class="h-8 w-8 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+        </div>
+        <p class="text-slate-500 font-semibold text-lg">No questions yet</p>
+        <p class="text-slate-600 text-sm mt-1">Click "Add Question" to get started.</p>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading-state" class="flex items-center justify-center py-24">
+        <div class="flex items-center gap-3 text-slate-500">
+          <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span class="text-sm font-medium">Loading questions...</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Add / Edit Modal -->
+  <div id="question-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+    <div id="question-modal-box" class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl shadow-2xl transform scale-95 transition-all duration-300 overflow-hidden">
+      <div class="flex items-center justify-between p-6 border-b border-slate-800">
+        <h2 id="modal-title-text" class="text-xl font-bold font-display text-white">Add Question</h2>
+        <button id="modal-close" class="p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 transition-all duration-200">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+        <input type="hidden" id="edit-id" value="" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Category *</label>
+            <select id="form-category" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200">
+              <option value="Java">Java</option>
+              <option value="Spring Boot">Spring Boot</option>
+              <option value="Angular">Angular</option>
+              <option value="MySQL / Database">MySQL / Database</option>
+              <option value="System Design">System Design</option>
+              <option value="REST API">REST API</option>
+              <option value="Behavioral">Behavioral</option>
+              <option value="General">General</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Difficulty *</label>
+            <select id="form-difficulty" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Question *</label>
+          <textarea
+            id="form-question"
+            rows="3"
+            placeholder="e.g. What is the difference between JDK, JRE, and JVM?"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder:text-slate-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200 resize-none"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Answer *</label>
+          <textarea
+            id="form-answer"
+            rows="6"
+            placeholder="Write your answer here..."
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder:text-slate-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200 resize-y"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tags (optional, comma-separated)</label>
+          <input
+            id="form-tags"
+            type="text"
+            placeholder="e.g. OOP, polymorphism, inheritance"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 placeholder:text-slate-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200"
+          />
+        </div>
+
+        <p id="form-error" class="text-rose-400 text-sm hidden"></p>
+      </div>
+
+      <div class="p-6 pt-4 border-t border-slate-800 flex justify-end gap-3">
+        <button id="form-cancel" class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 font-semibold text-sm transition-all duration-200">
+          Cancel
+        </button>
+        <button id="form-submit" class="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm transition-all duration-200 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+          <span id="form-submit-label">Save Question</span>
+          <svg id="form-spinner" class="hidden h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div id="delete-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[70] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center space-y-4 transform scale-95 transition-all duration-300">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20">
+        <svg class="h-6 w-6 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-white">Delete Question?</h3>
+        <p class="text-slate-500 text-sm mt-1">This action cannot be undone.</p>
+      </div>
+      <div class="flex gap-3">
+        <button id="delete-cancel" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white font-semibold text-sm transition-all duration-200">
+          Cancel
+        </button>
+        <button id="delete-confirm" class="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-sm transition-all duration-200">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+</Layout>
+
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY }}>
+  import { createClient } from '@supabase/supabase-js';
+
+  // ─── Supabase client ────────────────────────────────────────────────────────
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ─── Constants ──────────────────────────────────────────────────────────────
+  const SESSION_KEY = 'ky_interview_auth';
+  const ADMIN_PASSWORD = 'NoLifeLiao0729$';
+
+  const CATEGORIES = [
+    'Java', 'Spring Boot', 'Angular', 'MySQL / Database',
+    'System Design', 'REST API', 'Behavioral', 'General'
+  ];
+
+  const DIFFICULTY_CONFIG = {
+    easy:   { label: 'Easy',   cls: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' },
+    medium: { label: 'Medium', cls: 'bg-amber-500/15 text-amber-400 border-amber-500/20' },
+    hard:   { label: 'Hard',   cls: 'bg-rose-500/15 text-rose-400 border-rose-500/20' },
+  };
+
+  const CATEGORY_COLORS = [
+    'bg-blue-500/10 text-blue-400 border-blue-500/20',
+    'bg-green-500/10 text-green-400 border-green-500/20',
+    'bg-purple-500/10 text-purple-400 border-purple-500/20',
+    'bg-orange-500/10 text-orange-400 border-orange-500/20',
+    'bg-pink-500/10 text-pink-400 border-pink-500/20',
+    'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+    'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+    'bg-teal-500/10 text-teal-400 border-teal-500/20',
+  ];
+
+  // ─── State ──────────────────────────────────────────────────────────────────
+  let allQuestions = [];
+  let activeCategory = 'All';
+  let studyMode = false;
+  let pendingDeleteId = null;
+  let revealedAnswers = new Set();
+
+  // ─── Auth ───────────────────────────────────────────────────────────────────
+  const authGate = document.getElementById('auth-gate');
+  const mainApp  = document.getElementById('main-app');
+
+  async function hashPassword(pw) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function checkAuth() {
+    if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+      showApp();
+    }
+  }
+
+  function showApp() {
+    authGate.classList.add('hidden');
+    mainApp.classList.remove('hidden');
+    loadQuestions();
+  }
+
+  async function handleLogin() {
+    const pwInput = document.getElementById('admin-password');
+    const errEl   = document.getElementById('auth-error');
+    const inputHash = await hashPassword(pwInput.value.trim());
+    const correctHash = await hashPassword(ADMIN_PASSWORD);
+
+    if (inputHash === correctHash) {
+      sessionStorage.setItem(SESSION_KEY, 'true');
+      errEl.classList.add('hidden');
+      showApp();
+    } else {
+      errEl.classList.remove('hidden');
+      pwInput.classList.add('border-rose-500');
+      pwInput.value = '';
+      setTimeout(() => pwInput.classList.remove('border-rose-500'), 1000);
+    }
+  }
+
+  document.getElementById('auth-submit').addEventListener('click', handleLogin);
+  document.getElementById('admin-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    sessionStorage.removeItem(SESSION_KEY);
+    location.reload();
+  });
+
+  // ─── Load Questions ──────────────────────────────────────────────────────────
+  async function loadQuestions() {
+    document.getElementById('loading-state').classList.remove('hidden');
+    document.getElementById('questions-grid').classList.add('hidden');
+    document.getElementById('empty-state').classList.add('hidden');
+
+    const { data, error } = await supabase
+      .from('interview_questions')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    document.getElementById('loading-state').classList.add('hidden');
+
+    if (error) {
+      window.showToast('❌ Failed to load questions: ' + error.message, 'error');
+      return;
+    }
+
+    allQuestions = data || [];
+    renderCategoryPills();
+    renderStats();
+    renderQuestions();
+  }
+
+  // ─── Category Pills ──────────────────────────────────────────────────────────
+  function renderCategoryPills() {
+    const container = document.getElementById('category-pills');
+    const counts = {};
+    allQuestions.forEach(q => { counts[q.category] = (counts[q.category] || 0) + 1; });
+
+    const pills = ['All', ...CATEGORIES.filter(c => counts[c])];
+    container.innerHTML = pills.map(cat => {
+      const isActive = cat === activeCategory;
+      const count = cat === 'All' ? allQuestions.length : (counts[cat] || 0);
+      return `
+        <button
+          data-cat="${cat}"
+          class="category-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold border transition-all duration-200
+            ${isActive
+              ? 'bg-teal-600 border-teal-500 text-white'
+              : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+            }"
+        >
+          ${cat}
+          <span class="text-xs ${isActive ? 'bg-white/20' : 'bg-slate-800'} rounded-full px-1.5 py-0.5">${count}</span>
+        </button>
+      `;
+    }).join('');
+
+    container.querySelectorAll('.category-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeCategory = btn.dataset.cat;
+        renderCategoryPills();
+        renderQuestions();
+      });
+    });
+  }
+
+  // ─── Stats ───────────────────────────────────────────────────────────────────
+  function renderStats() {
+    const counts = { easy: 0, medium: 0, hard: 0 };
+    allQuestions.forEach(q => { counts[q.difficulty] = (counts[q.difficulty] || 0) + 1; });
+
+    const items = [
+      { label: 'Total', value: allQuestions.length, cls: 'text-teal-400' },
+      { label: 'Easy',   value: counts.easy,   cls: 'text-emerald-400' },
+      { label: 'Medium', value: counts.medium, cls: 'text-amber-400' },
+      { label: 'Hard',   value: counts.hard,   cls: 'text-rose-400' },
+    ];
+
+    document.getElementById('stats-row').innerHTML = items.map(item => `
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center">
+        <p class="text-2xl font-bold font-display ${item.cls}">${item.value}</p>
+        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">${item.label}</p>
+      </div>
+    `).join('');
+  }
+
+  // ─── Render Questions ────────────────────────────────────────────────────────
+  function renderQuestions() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const diffFilter = document.getElementById('difficulty-filter').value;
+    revealedAnswers = new Set();
+
+    let filtered = allQuestions.filter(q => {
+      const matchCat  = activeCategory === 'All' || q.category === activeCategory;
+      const matchDiff = !diffFilter || q.difficulty === diffFilter;
+      const matchSearch = !search ||
+        q.question.toLowerCase().includes(search) ||
+        q.answer.toLowerCase().includes(search) ||
+        (q.tags || []).some(t => t.toLowerCase().includes(search));
+      return matchCat && matchDiff && matchSearch;
+    });
+
+    const grid = document.getElementById('questions-grid');
+    const empty = document.getElementById('empty-state');
+
+    document.getElementById('total-badge').textContent =
+      `${allQuestions.length} question${allQuestions.length !== 1 ? 's' : ''}`;
+
+    if (filtered.length === 0) {
+      grid.classList.add('hidden');
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    grid.classList.remove('hidden');
+    empty.classList.add('hidden');
+
+    const catIdx = {};
+    CATEGORIES.forEach((c, i) => { catIdx[c] = i; });
+
+    grid.innerHTML = filtered.map(q => {
+      const diff = DIFFICULTY_CONFIG[q.difficulty] || DIFFICULTY_CONFIG.medium;
+      const catColor = CATEGORY_COLORS[catIdx[q.category] % CATEGORY_COLORS.length] || CATEGORY_COLORS[0];
+      const tags = (q.tags || []).map(t =>
+        `<span class="text-xs bg-slate-800 text-slate-500 rounded px-1.5 py-0.5">${t}</span>`
+      ).join('');
+
+      return `
+        <div class="group bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 flex flex-col gap-4 transition-all duration-200 hover:shadow-lg hover:shadow-slate-950/50">
+          <!-- Header -->
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-semibold border rounded-full px-2.5 py-0.5 ${catColor}">${q.category}</span>
+              <span class="text-xs font-semibold border rounded-full px-2.5 py-0.5 ${diff.cls}">${diff.label}</span>
+            </div>
+            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0">
+              <button data-edit="${q.id}" class="edit-btn p-1.5 rounded-lg text-slate-500 hover:text-teal-400 hover:bg-teal-500/10 transition-all duration-150" title="Edit">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button data-delete="${q.id}" class="delete-btn p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-150" title="Delete">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Question -->
+          <p class="text-sm font-semibold text-slate-200 leading-relaxed">${escapeHtml(q.question)}</p>
+
+          <!-- Answer -->
+          <div class="flex-1">
+            ${studyMode ? `
+              <button
+                data-reveal="${q.id}"
+                class="reveal-btn w-full text-left"
+              >
+                <div id="answer-hidden-${q.id}" class="bg-slate-800/50 border border-dashed border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-600 italic text-center hover:border-teal-500/30 hover:text-teal-500/60 transition-all duration-200 cursor-pointer">
+                  Click to reveal answer
+                </div>
+                <div id="answer-shown-${q.id}" class="hidden bg-slate-800/30 rounded-xl px-4 py-3 text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">${escapeHtml(q.answer)}</div>
+              </button>
+            ` : `
+              <div class="bg-slate-800/30 rounded-xl px-4 py-3 text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">${escapeHtml(q.answer)}</div>
+            `}
+          </div>
+
+          <!-- Tags -->
+          ${tags ? `<div class="flex flex-wrap gap-1.5">${tags}</div>` : ''}
+
+          <!-- Timestamp -->
+          <p class="text-xs text-slate-700">${new Date(q.created_at).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+        </div>
+      `;
+    }).join('');
+
+    // Bind edit/delete/reveal buttons
+    grid.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => openEditModal(btn.dataset.edit));
+    });
+    grid.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => openDeleteModal(btn.dataset.delete));
+    });
+    if (studyMode) {
+      grid.querySelectorAll('.reveal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.reveal;
+          const hidden = document.getElementById(`answer-hidden-${id}`);
+          const shown  = document.getElementById(`answer-shown-${id}`);
+          if (hidden && shown) {
+            hidden.classList.toggle('hidden');
+            shown.classList.toggle('hidden');
+          }
+        });
+      });
+    }
+  }
+
+  // ─── Study Mode ──────────────────────────────────────────────────────────────
+  document.getElementById('study-mode-btn').addEventListener('click', () => {
+    studyMode = !studyMode;
+    const label = document.getElementById('study-mode-label');
+    const btn   = document.getElementById('study-mode-btn');
+    label.textContent = studyMode ? 'Exit Study Mode' : 'Study Mode';
+    btn.classList.toggle('text-teal-400', studyMode);
+    btn.classList.toggle('border-teal-500/50', studyMode);
+    renderQuestions();
+  });
+
+  // ─── Search + Filter ─────────────────────────────────────────────────────────
+  document.getElementById('search-input').addEventListener('input', renderQuestions);
+  document.getElementById('difficulty-filter').addEventListener('change', renderQuestions);
+
+  // ─── Add / Edit Modal ─────────────────────────────────────────────────────────
+  function openAddModal() {
+    document.getElementById('modal-title-text').textContent = 'Add Question';
+    document.getElementById('edit-id').value = '';
+    document.getElementById('form-category').value = 'Java';
+    document.getElementById('form-difficulty').value = 'medium';
+    document.getElementById('form-question').value = '';
+    document.getElementById('form-answer').value = '';
+    document.getElementById('form-tags').value = '';
+    document.getElementById('form-error').classList.add('hidden');
+    document.getElementById('form-submit-label').textContent = 'Save Question';
+    showModal('question-modal');
+  }
+
+  function openEditModal(id) {
+    const q = allQuestions.find(q => q.id === id);
+    if (!q) return;
+    document.getElementById('modal-title-text').textContent = 'Edit Question';
+    document.getElementById('edit-id').value = q.id;
+    document.getElementById('form-category').value = q.category;
+    document.getElementById('form-difficulty').value = q.difficulty;
+    document.getElementById('form-question').value = q.question;
+    document.getElementById('form-answer').value = q.answer;
+    document.getElementById('form-tags').value = (q.tags || []).join(', ');
+    document.getElementById('form-error').classList.add('hidden');
+    document.getElementById('form-submit-label').textContent = 'Update Question';
+    showModal('question-modal');
+  }
+
+  document.getElementById('add-btn').addEventListener('click', openAddModal);
+  document.getElementById('modal-close').addEventListener('click', () => hideModal('question-modal'));
+  document.getElementById('form-cancel').addEventListener('click', () => hideModal('question-modal'));
+
+  document.getElementById('form-submit').addEventListener('click', async () => {
+    const id         = document.getElementById('edit-id').value;
+    const category   = document.getElementById('form-category').value;
+    const difficulty = document.getElementById('form-difficulty').value;
+    const question   = document.getElementById('form-question').value.trim();
+    const answer     = document.getElementById('form-answer').value.trim();
+    const tagsRaw    = document.getElementById('form-tags').value;
+    const tags       = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+    const errEl      = document.getElementById('form-error');
+    const submitBtn  = document.getElementById('form-submit');
+    const spinner    = document.getElementById('form-spinner');
+    const submitLbl  = document.getElementById('form-submit-label');
+
+    if (!question || !answer) {
+      errEl.textContent = 'Question and answer are required.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
+    errEl.classList.add('hidden');
+    submitBtn.disabled = true;
+    spinner.classList.remove('hidden');
+
+    let error;
+    if (id) {
+      const res = await supabase.from('interview_questions').update({
+        category, difficulty, question, answer, tags, updated_at: new Date().toISOString()
+      }).eq('id', id);
+      error = res.error;
+    } else {
+      const res = await supabase.from('interview_questions').insert([
+        { category, difficulty, question, answer, tags }
+      ]);
+      error = res.error;
+    }
+
+    submitBtn.disabled = false;
+    spinner.classList.add('hidden');
+
+    if (error) {
+      errEl.textContent = 'Error: ' + error.message;
+      errEl.classList.remove('hidden');
+    } else {
+      hideModal('question-modal');
+      window.showToast(id ? '✅ Question updated!' : '✅ Question added!', 'success');
+      await loadQuestions();
+    }
+  });
+
+  // ─── Delete Modal ─────────────────────────────────────────────────────────────
+  function openDeleteModal(id) {
+    pendingDeleteId = id;
+    showModal('delete-modal');
+  }
+
+  document.getElementById('delete-cancel').addEventListener('click', () => hideModal('delete-modal'));
+  document.getElementById('delete-confirm').addEventListener('click', async () => {
+    if (!pendingDeleteId) return;
+    const { error } = await supabase.from('interview_questions').delete().eq('id', pendingDeleteId);
+    hideModal('delete-modal');
+    if (error) {
+      window.showToast('❌ Failed to delete: ' + error.message, 'error');
+    } else {
+      window.showToast('🗑️ Question deleted.', 'info');
+      await loadQuestions();
+    }
+    pendingDeleteId = null;
+  });
+
+  // ─── Modal Helpers ────────────────────────────────────────────────────────────
+  function showModal(id) {
+    const modal = document.getElementById(id);
+    const box   = modal.querySelector('div');
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    modal.classList.add('opacity-100', 'pointer-events-auto');
+    box.classList.remove('scale-95');
+    box.classList.add('scale-100');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function hideModal(id) {
+    const modal = document.getElementById(id);
+    const box   = modal.querySelector('div');
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modal.classList.remove('opacity-100', 'pointer-events-auto');
+    box.classList.add('scale-95');
+    box.classList.remove('scale-100');
+    document.body.style.overflow = '';
+  }
+
+  // Close modals on backdrop click
+  ['question-modal', 'delete-modal'].forEach(id => {
+    document.getElementById(id).addEventListener('click', e => {
+      if (e.target === document.getElementById(id)) hideModal(id);
+    });
+  });
+
+  // ─── Utility ──────────────────────────────────────────────────────────────────
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ─── Init ─────────────────────────────────────────────────────────────────────
+  checkAuth();
+</script>

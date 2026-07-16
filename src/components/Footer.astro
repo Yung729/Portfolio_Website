@@ -12,8 +12,15 @@
       </a>
 
       <!-- Copyright -->
-      <p class="text-sm text-slate-500 dark:text-slate-400 text-center md:order-last">
-        &copy; {new Date().getFullYear()} Leong Kah Yung. All rights reserved.
+      <p class="text-sm text-slate-500 dark:text-slate-400 text-center md:order-last flex items-center gap-2">
+        <span>&copy; {new Date().getFullYear()} Leong Kah Yung. All rights reserved.</span>
+        <!-- Hidden admin entry — not labeled, just a subtle dot -->
+        <button
+          id="footer-admin-btn"
+          class="text-slate-700 dark:text-slate-800 hover:text-slate-400 dark:hover:text-slate-600 transition-colors duration-200 text-base leading-none select-none"
+          title=""
+          aria-label="Admin"
+        >·</button>
       </p>
 
       <!-- Socials & Top Scroll -->
@@ -61,3 +68,93 @@
     </div>
   </div>
 </footer>
+
+<!-- Admin Password Modal (triggered by footer dot) -->
+<div id="footer-admin-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[80] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+  <div id="footer-admin-box" class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm shadow-2xl p-6 transform scale-95 transition-all duration-300">
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/20 mb-3">
+        <svg class="h-6 w-6 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-white font-display">Admin Access</h3>
+    </div>
+    <div class="space-y-4">
+      <input
+        id="footer-admin-password"
+        type="password"
+        placeholder="Enter password..."
+        class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200"
+      />
+      <p id="footer-admin-error" class="text-rose-400 text-sm hidden">Incorrect password.</p>
+      <div class="flex gap-3">
+        <button id="footer-admin-cancel" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white font-semibold text-sm transition-all duration-200">
+          Cancel
+        </button>
+        <button id="footer-admin-submit" class="flex-1 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm transition-all duration-200">
+          Unlock
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ADMIN_PASSWORD = 'NoLifeLiao0729$';
+  const SESSION_KEY = 'ky_interview_auth';
+
+  async function hashPassword(pw) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  const footerBtn    = document.getElementById('footer-admin-btn');
+  const modal        = document.getElementById('footer-admin-modal');
+  const modalBox     = document.getElementById('footer-admin-box');
+  const pwInput      = document.getElementById('footer-admin-password');
+  const errEl        = document.getElementById('footer-admin-error');
+  const cancelBtn    = document.getElementById('footer-admin-cancel');
+  const submitBtn    = document.getElementById('footer-admin-submit');
+
+  function openAdminModal() {
+    pwInput.value = '';
+    errEl.classList.add('hidden');
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    modal.classList.add('opacity-100', 'pointer-events-auto');
+    modalBox.classList.remove('scale-95');
+    modalBox.classList.add('scale-100');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => pwInput.focus(), 100);
+  }
+
+  function closeAdminModal() {
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modal.classList.remove('opacity-100', 'pointer-events-auto');
+    modalBox.classList.add('scale-95');
+    modalBox.classList.remove('scale-100');
+    document.body.style.overflow = '';
+  }
+
+  async function handleAdminSubmit() {
+    const inputHash   = await hashPassword(pwInput.value.trim());
+    const correctHash = await hashPassword(ADMIN_PASSWORD);
+    if (inputHash === correctHash) {
+      sessionStorage.setItem(SESSION_KEY, 'true');
+      closeAdminModal();
+      window.location.href = '/interview';
+    } else {
+      errEl.classList.remove('hidden');
+      pwInput.classList.add('border-rose-500');
+      pwInput.value = '';
+      setTimeout(() => pwInput.classList.remove('border-rose-500'), 1000);
+    }
+  }
+
+  footerBtn?.addEventListener('click', openAdminModal);
+  cancelBtn?.addEventListener('click', closeAdminModal);
+  submitBtn?.addEventListener('click', handleAdminSubmit);
+  pwInput?.addEventListener('keydown', e => { if (e.key === 'Enter') handleAdminSubmit(); });
+  modal?.addEventListener('click', e => { if (e.target === modal) closeAdminModal(); });
+</script>
+
