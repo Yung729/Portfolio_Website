@@ -6,6 +6,57 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 ---
 
 <Layout title="Interview Prep | KY Admin" description="Private interview preparation tool">
+  
+  <style is:global>
+    /* Markdown Styles */
+    .markdown-content p {
+      margin-bottom: 0.75em;
+    }
+    .markdown-content p:last-child {
+      margin-bottom: 0;
+    }
+    .markdown-content code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.85em;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 0.2em 0.4em;
+      border-radius: 0.25rem;
+      color: #34d399; /* emerald-400 */
+    }
+    .markdown-content pre {
+      background-color: rgba(15, 23, 42, 0.6); /* slate-900 */
+      border: 1px solid rgba(30, 41, 59, 0.5); /* slate-800 */
+      padding: 1em;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin: 1em 0;
+    }
+    .markdown-content pre code {
+      background-color: transparent;
+      padding: 0;
+      color: #e2e8f0; /* slate-200 */
+      font-size: 0.875em;
+    }
+    .markdown-content ul {
+      list-style-type: disc;
+      padding-left: 1.5em;
+      margin-bottom: 0.75em;
+    }
+    .markdown-content ol {
+      list-style-type: decimal;
+      padding-left: 1.5em;
+      margin-bottom: 0.75em;
+    }
+    .markdown-content a {
+      color: #14b8a6; /* teal-500 */
+      text-decoration: underline;
+    }
+    .markdown-content strong {
+      font-weight: 600;
+      color: #f8fafc; /* slate-50 */
+    }
+  </style>
+
   <!-- Pass env vars to client safely via data attributes -->
   <div id="app-config" data-url={SUPABASE_URL} data-key={SUPABASE_ANON_KEY} class="hidden"></div>
   <!-- Auth Gate -->
@@ -273,6 +324,11 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 <script>
   import { createClient } from '@supabase/supabase-js';
+  import { marked } from 'marked';
+  import DOMPurify from 'dompurify';
+
+  // Configure marked for line breaks
+  marked.setOptions({ breaks: true });
 
   // ─── Read env vars from data attributes (avoids define:vars + import conflict) ─
   const config = document.getElementById('app-config');
@@ -501,7 +557,7 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
           </div>
 
           <!-- Question -->
-          <p class="text-sm font-semibold text-slate-200 leading-relaxed">${escapeHtml(q.question)}</p>
+          <div class="text-sm font-semibold text-slate-200 leading-relaxed markdown-content">${DOMPurify.sanitize(marked.parse(q.question))}</div>
 
           <!-- Answer -->
           <div class="flex-1">
@@ -513,10 +569,10 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
                 <div id="answer-hidden-${q.id}" class="bg-slate-800/50 border border-dashed border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-600 italic text-center hover:border-teal-500/30 hover:text-teal-500/60 transition-all duration-200 cursor-pointer">
                   Click to reveal answer
                 </div>
-                <div id="answer-shown-${q.id}" class="hidden bg-slate-800/30 rounded-xl px-4 py-3 text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">${escapeHtml(q.answer)}</div>
+                <div id="answer-shown-${q.id}" class="hidden bg-slate-800/30 rounded-xl px-4 py-3 text-sm text-slate-400 leading-relaxed markdown-content">${DOMPurify.sanitize(marked.parse(q.answer))}</div>
               </button>
             ` : `
-              <div class="bg-slate-800/30 rounded-xl px-4 py-3 text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">${escapeHtml(q.answer)}</div>
+              <div class="bg-slate-800/30 rounded-xl px-4 py-3 text-sm text-slate-400 leading-relaxed markdown-content">${DOMPurify.sanitize(marked.parse(q.answer))}</div>
             `}
           </div>
 
