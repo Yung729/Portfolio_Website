@@ -6,6 +6,8 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 ---
 
 <Layout title="Interview Prep | KY Admin" description="Private interview preparation tool">
+  <!-- Pass env vars to client safely via data attributes -->
+  <div id="app-config" data-url={SUPABASE_URL} data-key={SUPABASE_ANON_KEY} class="hidden"></div>
   <!-- Auth Gate -->
   <div id="auth-gate" class="min-h-screen flex items-center justify-center bg-slate-950 px-4">
     <div class="w-full max-w-sm">
@@ -269,8 +271,13 @@ const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 </Layout>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY }}>
+<script>
   import { createClient } from '@supabase/supabase-js';
+
+  // ─── Read env vars from data attributes (avoids define:vars + import conflict) ─
+  const config = document.getElementById('app-config');
+  const SUPABASE_URL = config?.dataset.url ?? '';
+  const SUPABASE_ANON_KEY = config?.dataset.key ?? '';
 
   // ─── Supabase client ────────────────────────────────────────────────────────
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
